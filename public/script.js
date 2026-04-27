@@ -1,4 +1,10 @@
-const socket = io();
+// Connect to the backend
+// Change this URL to your Render URL after deployment!
+const SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000' 
+    : 'https://votre-projet-render.onrender.com'; // <--- REMPLACEZ PAR VOTRE URL RENDER
+
+const socket = io(SERVER_URL);
 
 // DOM Elements
 const lobbyScreen = document.getElementById('lobby-screen');

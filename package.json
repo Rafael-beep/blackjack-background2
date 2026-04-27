@@ -4,7 +4,8 @@
   "description": "Jeu de soirée multijoueur en temps réel.",
   "main": "server.js",
   "scripts": {
-    "start": "taskkill /F /IM node.exe 2>nul & node server.js",
+    "start": "node server.js",
+    "start:win": "taskkill /F /IM node.exe 2>nul & node server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
