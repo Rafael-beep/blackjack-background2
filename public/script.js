@@ -511,6 +511,7 @@ window.sendGageProposal = function() {
 let currentlyAnimatingGage = null;
 
 function renderGageSystem(state) {
+    // Utilisation des variables globales pour éviter les conflits
     if (state.gameState === 'proposing_gages') {
         currentlyAnimatingGage = null; 
         gageOverlay.classList.remove('hidden');
@@ -544,7 +545,11 @@ function renderGageSystem(state) {
 
         if (state.lastGageResult && currentlyAnimatingGage !== state.lastGageResult.gage) {
             currentlyAnimatingGage = state.lastGageResult.gage;
-            startRouletteAnimation(state.lastGageResult.gage);
+            console.log("Démarrage animation pour :", currentlyAnimatingGage);
+            // On attend que le DOM soit prêt pour calculer les dimensions
+            setTimeout(() => {
+                startRouletteAnimation(state.lastGageResult.gage);
+            }, 100);
         }
     } 
     else if (state.gameState === 'gage_result') {
