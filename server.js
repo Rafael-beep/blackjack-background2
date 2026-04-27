@@ -234,7 +234,9 @@ io.on('connection', (socket) => {
                 luckyRafou: false,
                 unluckyPlayers: []
             },
-            powersEnabled: true
+            powersEnabled: true,
+            proposedGages: [],
+            gageTargetPlayerId: null
         };
 
         joinRoom(socket, roomId, playerName);
@@ -316,10 +318,10 @@ io.on('connection', (socket) => {
             p.hasDoubled = false;
             p.consecutiveLosses = 0;
             
-            // Power Assignment: 100% chance for now if enabled
+            // Power Assignment: 40% chance if enabled
             p.power = null;
             p.powerTarget = null;
-            if (room.powersEnabled) {
+            if (room.powersEnabled && Math.random() < 0.4) {
                 p.power = powers[Math.floor(Math.random() * powers.length)];
             }
         });
@@ -531,6 +533,80 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('chooseGage', () => {
+        const roomId = socket.roomId;
+        if (!roomId || !rooms[roomId]) return;
+        const room = rooms[roomId];
+        const player = room.players.find(p => p.id === socket.id);
+        
+        if (player && player.needsToDrink) {
+            room.gameState = 'proposing_gages';
+            room.gageTargetPlayerId = player.id;
+            room.proposedGages = [];
+            broadcastUpdate(roomId);
+        }
+    });
+
+    socket.on('proposeGage', ({ gage }) => {
+        const roomId = socket.roomId;
+        if (!roomId || !rooms[roomId]) return;
+        const room = rooms[roomId];
+        
+        // Target can't propose a gage for themselves
+        if (socket.id === room.gageTargetPlayerId) return;
+        
+        // Prevent multiple proposals from same player
+        if (room.proposedGages.some(g => g.playerId === socket.id)) return;
+
+        room.proposedGages.push({
+            playerId: socket.id,
+            playerName: room.players.find(p => p.id === socket.id)?.name || 'Anonyme',
+            text: gage
+        });
+
+        broadcastUpdate(roomId);
+    });
+
+    socket.on('spinGageRoulette', () => {
+        const roomId = socket.roomId;
+        if (!roomId || !rooms[roomId]) return;
+        const room = rooms[roomId];
+        
+        if (room.gameState === 'proposing_gages' && room.proposedGages.length > 0) {
+            const winnerGage = room.proposedGages[Math.floor(Math.random() * room.proposedGages.length)];
+            
+            // Broadcast the result
+            io.emit('gageResult', {
+                roomId: roomId,
+                targetName: room.players.find(p => p.id === room.gageTargetPlayerId)?.name,
+                gage: winnerGage.text,
+                proposer: winnerGage.playerName
+            });
+
+            // Back to drinking check or lobby after a short delay
+            setTimeout(() => {
+                const target = room.players.find(p => p.id === room.gageTargetPlayerId);
+                if (target) {
+                    target.needsToDrink = false;
+                    target.sipsToDrink = 0;
+                    target.validations = 0;
+                    target.hasValidated = [];
+                }
+                
+                // Check if others still need to drink
+                const othersDrinking = room.players.filter(p => p.needsToDrink);
+                if (othersDrinking.length === 0) {
+                    room.gameState = 'lobby';
+                } else {
+                    room.gameState = 'drinking_check';
+                }
+                room.proposedGages = [];
+                room.gageTargetPlayerId = null;
+                broadcastUpdate(roomId);
+            }, 8000); 
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
         const roomId = socket.roomId;
@@ -577,6 +653,8 @@ const getPublicRoomState = (room, playerId) => {
         dealerScore: dealerScore,
         cheats: room.cheats,
         powersEnabled: room.powersEnabled,
+        proposedGages: room.proposedGages,
+        gageTargetPlayerId: room.gageTargetPlayerId,
         players: room.players.map(p => {
             const isMe = p.id === playerId;
             return {

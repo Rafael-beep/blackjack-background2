@@ -49,6 +49,18 @@ const lacheTargetContainer = document.getElementById('lacheTargetContainer');
 const lacheTargetSelect = document.getElementById('lacheTargetSelect');
 const btnUseLache = document.getElementById('btnUseLache');
 
+const gageOverlay = document.getElementById('gageOverlay');
+const proposeGageBox = document.getElementById('proposeGageBox');
+const gageInput = document.getElementById('gageInput');
+const btnSendGage = document.getElementById('btnSendGage');
+const proposalsCount = document.getElementById('proposalsCount');
+const btnSpinRoulette = document.getElementById('btnSpinRoulette');
+const rouletteDisplay = document.getElementById('rouletteDisplay');
+const rouletteAnimation = document.getElementById('rouletteAnimation');
+const gageResultBox = document.getElementById('gageResultBox');
+const gageResultText = document.getElementById('gageResultText');
+const gageResultInfo = document.getElementById('gageResultInfo');
+
 // Toggle power details on emoji click
 powerToggleBtn.addEventListener('click', () => {
     powerDetails.classList.toggle('hidden');
@@ -112,6 +124,8 @@ socket.on('updateState', (state) => {
 
     roomNameDisplay.textContent = state.id;
     sipsBetDisplay.textContent = state.sipsBet;
+
+    renderGageSystem(state);
 
     // Powers toggle visibility/availability
     const isCreator = state.players.length > 0 && state.players[0].id === socket.id;
@@ -374,7 +388,16 @@ function handleGameState(state) {
             let notifs = [];
             losers.forEach(loser => {
                 if (loser.id === socket.id) {
-                    notifs.push(`🍷 Vous devez boire <strong>${loser.sipsToDrink}</strong> gorgée(s) ! (Validations: ${loser.validations}/${state.requiredValidations})`);
+                    notifs.push(`
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <span>🍷 Vous devez boire <strong>${loser.sipsToDrink}</strong> gorgée(s) !</span>
+                            <div style="display:flex; gap:10px; justify-content:center;">
+                                <button class="btn success" onclick="socket.emit('validateDrink', socket.id)">J'ai bu ✅</button>
+                                <button class="btn warning" onclick="socket.emit('chooseGage')" style="background:#eab308; color:black;">Je préfère un gage 🎰</button>
+                            </div>
+                            <small>(Validations: ${loser.validations}/${state.requiredValidations})</small>
+                        </div>
+                    `);
                 } else {
                     notifs.push(`⌛ En attente que <strong>${loser.name}</strong> boive ses ${loser.sipsToDrink} gorgées...`);
                 }
@@ -454,4 +477,102 @@ btnUseLache.addEventListener('click', () => {
     if (targetId) {
         socket.emit('usePower', targetId);
     }
+});
+
+function renderGageSystem(state) {
+    const isTarget = state.gageTargetPlayerId === socket.id;
+    const isCreator = state.players.length > 0 && state.players[0].id === socket.id;
+    
+    if (state.gameState === 'proposing_gages') {
+        gageOverlay.classList.remove('hidden');
+        gageResultBox.classList.add('hidden');
+        rouletteDisplay.classList.add('hidden');
+        
+        if (isTarget) {
+            proposeGageBox.classList.remove('hidden');
+            proposeGageBox.innerHTML = `<h3>⌛ On vous prépare un gage...</h3><p>Les autres joueurs sont en train de voter pour votre destin.</p>`;
+        } else {
+            proposeGageBox.classList.remove('hidden');
+            // Check if already proposed
+            const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
+            if (hasProposed) {
+                proposeGageBox.innerHTML = `<h3>✅ Proposition envoyée</h3><p>Attendez que la roulette soit lancée.</p>`;
+            } else {
+                // Restore original HTML if needed (first time)
+                if (!proposeGageBox.querySelector('#btnSendGage')) {
+                    proposeGageBox.innerHTML = `
+                        <h3>💡 Proposez un gage !</h3>
+                        <p>Le perdant a choisi un gage... Soyez créatifs.</p>
+                        <input type="text" id="gageInput" placeholder="Ex: Faire 10 pompes" />
+                        <button id="btnSendGage" class="btn primary">Envoyer 📤</button>
+                        <p id="proposalsCount" style="margin-top:10px; font-size:0.9rem; color:var(--text-dim);"></p>
+                        <button id="btnSpinRoulette" class="btn action hidden" style="background:#eab308; color:black; margin-top:10px;">Lancer la Roulette 🎰</button>
+                    `;
+                    // Re-attach listeners because we innerHTMLed
+                    document.getElementById('btnSendGage').onclick = () => {
+                        const val = document.getElementById('gageInput').value.trim();
+                        if (val) socket.emit('proposeGage', { gage: val });
+                    };
+                    document.getElementById('btnSpinRoulette').onclick = () => {
+                        socket.emit('spinGageRoulette');
+                    };
+                }
+            }
+            
+            const countEl = document.getElementById('proposalsCount');
+            if (countEl) countEl.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
+            
+            const spinBtn = document.getElementById('btnSpinRoulette');
+            if (spinBtn) {
+                if (isCreator && state.proposedGages.length > 0) spinBtn.classList.remove('hidden');
+                else spinBtn.classList.add('hidden');
+            }
+        }
+    } else if (state.gameState !== 'gage_roulette') {
+        gageOverlay.classList.add('hidden');
+    }
+}
+
+socket.on('gageResult', (data) => {
+    // Show only for target room
+    if (socket.roomId && data.roomId !== socket.roomId) return;
+
+    proposeGageBox.classList.add('hidden');
+    rouletteDisplay.classList.remove('hidden');
+    gageOverlay.classList.remove('hidden');
+    
+    // Setup roulette items (visual trick)
+    const items = ["?", "...", "???", data.gage, "Presque!", "Pas de bol", "Ouch", data.gage, data.gage];
+    // Shuffle items for visual variety
+    for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+    }
+    // Make sure data.gage is at the end for the spin effect
+    items.push(data.gage);
+    
+    rouletteAnimation.innerHTML = '';
+    items.forEach(it => {
+        const div = document.createElement('div');
+        div.className = 'roulette-item';
+        div.textContent = it;
+        rouletteAnimation.appendChild(div);
+    });
+    
+    // Trigger animation
+    rouletteAnimation.style.transition = 'none';
+    rouletteAnimation.style.transform = 'translateX(0)';
+    setTimeout(() => {
+        rouletteAnimation.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
+        const stopPos = (items.length - 1) * 200; 
+        const centerOffset = (rouletteDisplay.offsetWidth / 2) - 100;
+        rouletteAnimation.style.transform = `translateX(-${stopPos - centerOffset}px)`;
+    }, 50);
+    
+    setTimeout(() => {
+        rouletteDisplay.classList.add('hidden');
+        gageResultBox.classList.remove('hidden');
+        gageResultText.textContent = data.gage;
+        gageResultInfo.textContent = `Pour ${data.targetName} — Proposé par ${data.proposer}`;
+    }, 6000);
 });

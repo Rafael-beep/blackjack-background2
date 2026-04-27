@@ -663,3 +663,91 @@ h3 span {
         font-size: 1.1rem;
     }
 }
+
+/* Gage System */
+.gage-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+}
+
+.gage-box {
+    background: #111827;
+    border: 2px solid #eab308;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 0 30px rgba(234, 179, 8, 0.2);
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gage-box h3 { margin-bottom: 10px; color: #eab308; }
+.gage-box p { color: var(--text-dim); margin-bottom: 20px; }
+.gage-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    border-radius: 8px;
+    color: white;
+}
+
+/* Roulette */
+.roulette-display {
+    width: 100%;
+    max-width: 500px;
+}
+
+.roulette-content {
+    position: relative;
+    height: 100px;
+    overflow: hidden;
+    background: #0f172a;
+    border: 3px solid #eab308;
+    border-radius: 12px;
+}
+
+.roulette-animation {
+    display: flex;
+    height: 100%;
+    transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+
+.roulette-item {
+    min-width: 200px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(234, 179, 8, 0.2);
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to bottom, #1e293b, #0f172a);
+    white-space: nowrap;
+    padding: 0 20px;
+}
+
+.roulette-pointer {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    z-index: 10;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
