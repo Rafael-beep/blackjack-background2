@@ -50,20 +50,19 @@ const lacheTargetSelect = document.getElementById('lacheTargetSelect');
 const btnUseLache = document.getElementById('btnUseLache');
 
 const gageOverlay = document.getElementById('gageOverlay');
-const proposeGageBox = document.getElementById('proposeGageBox');
+const gageBox = document.getElementById('gageBox');
+const gageProposeArea = document.getElementById('gageProposeArea');
+const gageWaitArea = document.getElementById('gageWaitArea');
+const gageSentArea = document.getElementById('gageSentArea');
 const gageInput = document.getElementById('gageInput');
 const btnSendGage = document.getElementById('btnSendGage');
-const proposalsCount = document.getElementById('proposalsCount');
 const btnSpinRoulette = document.getElementById('btnSpinRoulette');
+const proposalsCount = document.getElementById('proposalsCount');
 const rouletteDisplay = document.getElementById('rouletteDisplay');
 const rouletteAnimation = document.getElementById('rouletteAnimation');
 const gageResultBox = document.getElementById('gageResultBox');
 const gageResultText = document.getElementById('gageResultText');
 const gageResultInfo = document.getElementById('gageResultInfo');
-
-const gageProposeArea = document.getElementById('gageProposeArea');
-const gageWaitArea = document.getElementById('gageWaitArea');
-const gageSentArea = document.getElementById('gageSentArea');
 
 // Toggle power details on emoji click
 powerToggleBtn.addEventListener('click', () => {
@@ -537,7 +536,7 @@ socket.on('gageResult', (data) => {
     // Show only for target room
     if (socket.roomId && data.roomId !== socket.roomId) return;
 
-    proposeGageBox.classList.add('hidden');
+    gageBox.classList.add('hidden');
     rouletteDisplay.classList.remove('hidden');
     gageOverlay.classList.remove('hidden');
     
