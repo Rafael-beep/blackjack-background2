@@ -212,13 +212,16 @@ io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     socket.on('createRoom', ({ roomId, playerName, sipsBet }) => {
-        if (rooms[roomId]) {
+        const rId = roomId.toLowerCase().trim();
+        if (rooms[rId]) {
             socket.emit('errorMsg', 'La salle existe déjà.');
             return;
         }
         
-        rooms[roomId] = {
-            id: roomId,
+        console.log(`[CREATE] Room: ${rId} by ${playerName}`);
+        
+        rooms[rId] = {
+            id: rId,
             sipsBet: sipsBet,
             players: [],
             dealerHand: [],
@@ -237,15 +240,18 @@ io.on('connection', (socket) => {
     });
 
     socket.on('joinRoom', ({ roomId, playerName }) => {
-        if (!rooms[roomId]) {
+        const rId = roomId.toLowerCase().trim();
+        if (!rooms[rId]) {
+            console.log(`[JOIN FAIL] Room ${rId} not found for ${playerName}`);
             socket.emit('errorMsg', 'La salle n\'existe pas.');
             return;
         }
-        if (rooms[roomId].gameState !== 'lobby') {
+        if (rooms[rId].gameState !== 'lobby') {
             socket.emit('errorMsg', 'Partie déjà en cours.');
             return;
         }
-        joinRoom(socket, roomId, playerName);
+        console.log(`[JOIN] Room: ${rId} user: ${playerName}`);
+        joinRoom(socket, rId, playerName);
     });
 
     socket.on('togglePowers', ({ enabled }) => {
