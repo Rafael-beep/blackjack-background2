@@ -678,6 +678,7 @@ const getPublicRoomState = (room, playerId) => {
         proposedGages: room.proposedGages,
         gageTargetPlayerId: room.gageTargetPlayerId,
         gageTargetPlayerName: room.gageTargetPlayerName,
+        activeGageData: room.activeGageData,
         players: room.players.map(p => {
             const isMe = p.id === playerId;
             return {
