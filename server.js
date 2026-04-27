@@ -577,6 +577,8 @@ io.on('connection', (socket) => {
         if (room.gameState === 'proposing_gages' && room.proposedGages.length > 0) {
             const winnerGage = room.proposedGages[Math.floor(Math.random() * room.proposedGages.length)];
             
+            room.gameState = 'gage_roulette'; // NEW STATE
+            
             // Broadcast the result
             io.emit('gageResult', {
                 roomId: roomId,

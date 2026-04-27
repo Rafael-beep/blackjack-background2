@@ -533,7 +533,11 @@ function renderGageSystem(state) {
             
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
-    } else if (state.gameState !== 'gage_roulette') {
+    } else if (state.gameState === 'gage_roulette') {
+        // While spinning, ensure overlay is visible but don't touch sub-elements
+        // as the gageResult event already handled them.
+        gageOverlay.classList.remove('hidden');
+    } else {
         gageOverlay.classList.add('hidden');
     }
 }
