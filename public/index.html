@@ -81,7 +81,6 @@
                         <input type="text" id="gageInput" placeholder="Ex: Faire 10 pompes" />
                         <button id="btnSendGage" class="btn primary" onclick="sendGageProposal()">Envoyer 📤</button>
                         <p id="proposalsCount" style="margin-top:10px; font-size:0.9rem; color:var(--text-dim);"></p>
-                        <button id="btnSpinRoulette" class="btn warning hidden" style="margin-top:10px; width: 100%;">Lancer la Roulette 🎰</button>
                     </div>
                     <div id="gageWaitArea" class="hidden">
                         <h3>⌛ On vous prépare un gage...</h3>
@@ -91,6 +90,8 @@
                         <h3>✅ Proposition envoyée</h3>
                         <p>Attendez que la roulette soit lancée.</p>
                     </div>
+                    <!-- Common button for everyone -->
+                    <button id="btnSpinRoulette" class="btn warning hidden" style="margin-top:20px; width: 100%;">Lancer la Roulette 🎰</button>
                 </div>
 
                 <div id="rouletteDisplay" class="roulette-display hidden">

@@ -533,13 +533,13 @@ function renderGageSystem(state) {
             }
             
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
-            
-            // Allow ANYONE to launch the roulette if there is at least one gage
-            if (state.proposedGages.length > 0) {
-                btnSpinRoulette.classList.remove('hidden');
-            } else {
-                btnSpinRoulette.classList.add('hidden');
-            }
+        }
+
+        // EVERYONE (including the target) sees the button if there is at least 1 gage
+        if (state.proposedGages.length > 0) {
+            btnSpinRoulette.classList.remove('hidden');
+        } else {
+            btnSpinRoulette.classList.add('hidden');
         }
     } else if (state.gameState !== 'gage_roulette') {
         gageOverlay.classList.add('hidden');
