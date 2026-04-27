@@ -511,10 +511,20 @@ window.sendGageProposal = function() {
 let currentlyAnimatingGage = null;
 
 function renderGageSystem(state) {
-    // Utilisation des variables globales pour éviter les conflits
+    if (!state) return;
+
+    // Reset total si on n'est pas dans une phase de gage
+    const gageStates = ['proposing_gages', 'gage_roulette', 'gage_result'];
+    if (!gageStates.includes(state.gameState)) {
+        gageOverlay.classList.add('hidden');
+        currentlyAnimatingGage = null;
+        return;
+    }
+
+    gageOverlay.classList.remove('hidden');
+
+    // 1. Phase de PROPOSITION
     if (state.gameState === 'proposing_gages') {
-        currentlyAnimatingGage = null; 
-        gageOverlay.classList.remove('hidden');
         gageBox.classList.remove('hidden');
         rouletteDisplay.classList.add('hidden');
         gageResultBox.classList.add('hidden');
@@ -537,72 +547,45 @@ function renderGageSystem(state) {
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
     } 
+    // 2. Phase de ROULETTE
     else if (state.gameState === 'gage_roulette') {
-        gageOverlay.classList.remove('hidden');
         gageBox.classList.add('hidden');
         rouletteDisplay.classList.remove('hidden');
         gageResultBox.classList.add('hidden');
 
-        if (state.lastGageResult && state.lastGageResult.gage) {
-            if (currentlyAnimatingGage !== state.lastGageResult.gage) {
-                currentlyAnimatingGage = state.lastGageResult.gage;
-                console.log("!!! ROULETTE DETECTEE !!! Gage:", currentlyAnimatingGage);
-                
-                requestAnimationFrame(() => {
-                    setTimeout(() => {
-                        startRouletteAnimation(state.lastGageResult.gage);
-                    }, 50);
-                });
-            }
-        } else {
-            console.error("ERREUR: lastGageResult est vide dans l'état !", state);
+        const winGage = state.lastGageResult ? state.lastGageResult.gage : null;
+        
+        if (winGage && currentlyAnimatingGage !== winGage) {
+            currentlyAnimatingGage = winGage;
+            console.log("Lancement Roulette pour:", winGage);
+            
+            // Animation simplifiée
+            const items = ["?", "🍷", "!!!", winGage, "OUCH", "ZUT", winGage, "VITE", winGage];
+            rouletteAnimation.innerHTML = items.map(it => `<div class="roulette-item">${it}</div>`).join('');
+            
+            rouletteAnimation.style.transition = 'none';
+            rouletteAnimation.style.transform = 'translateX(0)';
+            
+            setTimeout(() => {
+                rouletteAnimation.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                // Valeur fixe de secours pour le décalage
+                rouletteAnimation.style.transform = `translateX(-1200px)`;
+            }, 100);
         }
     } 
+    // 3. Phase de RESULTAT
     else if (state.gameState === 'gage_result') {
-        gageOverlay.classList.remove('hidden');
         gageBox.classList.add('hidden');
         rouletteDisplay.classList.add('hidden');
         gageResultBox.classList.remove('hidden');
 
         if (state.lastGageResult && state.lastGageResult.gage) {
-            console.log("AFFICHAGE RESULTAT:", state.lastGageResult.gage);
-            gageResultText.textContent = state.lastGageResult.gage;
+            gageResultText.innerHTML = `<span style="color:#facc15">${state.lastGageResult.gage}</span>`;
             gageResultInfo.textContent = `Pour ${state.lastGageResult.targetName} — Proposé par ${state.lastGageResult.proposer}`;
         } else {
-            gageResultText.textContent = "Gage : " + (currentlyAnimatingGage || "tg");
-            gageResultInfo.textContent = "Désolé, petit bug d'affichage mais le gage était bien là.";
+            gageResultText.textContent = "Gage : " + (currentlyAnimatingGage || "En attente...");
         }
-    } 
-    else {
-        gageOverlay.classList.add('hidden');
-        currentlyAnimatingGage = null;
     }
-}
-
-function startRouletteAnimation(winnerGage) {
-    const items = ["?", "...", "???", winnerGage, "Presque!", "Pas de bol", "Ouch", winnerGage, winnerGage];
-    for (let i = items.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [items[i], items[j]] = [items[j], items[i]];
-    }
-    items.push(winnerGage);
-    
-    rouletteAnimation.innerHTML = '';
-    items.forEach(it => {
-        const div = document.createElement('div');
-        div.className = 'roulette-item';
-        div.textContent = it;
-        rouletteAnimation.appendChild(div);
-    });
-    
-    rouletteAnimation.style.transition = 'none';
-    rouletteAnimation.style.transform = 'translateX(0)';
-    setTimeout(() => {
-        rouletteAnimation.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
-        const stopPos = (items.length - 1) * 200; 
-        const centerOffset = (rouletteDisplay.offsetWidth / 2) - 100;
-        rouletteAnimation.style.transform = `translateX(-${stopPos - centerOffset}px)`;
-    }, 50);
 }
 
 // Fixed listeners
