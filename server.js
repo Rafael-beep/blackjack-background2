@@ -236,7 +236,8 @@ io.on('connection', (socket) => {
             },
             powersEnabled: true,
             proposedGages: [],
-            gageTargetPlayerId: null
+            gageTargetPlayerId: null,
+            lastGageResult: null // Store result here
         };
 
         joinRoom(socket, roomId, playerName);
@@ -579,41 +580,42 @@ io.on('connection', (socket) => {
         if (room.gameState === 'proposing_gages' && room.proposedGages.length > 0) {
             const winnerGage = room.proposedGages[Math.floor(Math.random() * room.proposedGages.length)];
             
-            room.gameState = 'gage_roulette'; // NEW STATE
-            
-            // Broadcast the result ONLY to the room
-            io.to(roomId).emit('gageResult', {
-                roomId: roomId,
-                targetName: room.players.find(p => p.id === room.gageTargetPlayerId)?.name,
+            room.gameState = 'gage_roulette';
+            room.lastGageResult = {
                 gage: winnerGage.text,
-                proposer: winnerGage.playerName
-            });
+                proposer: winnerGage.playerName,
+                targetName: room.players.find(p => p.id === room.gageTargetPlayerId)?.name
+            };
+            
+            broadcastUpdate(roomId);
 
-            // Back to drinking check or lobby after a short delay
+            // Phase 1: Animation (6s)
             setTimeout(() => {
-                // SAFETY CHECK: Only reset if we are still in the roulette phase
-                // or if the target still exists. If a new game started, don't touch anything!
                 if (room.gameState !== 'gage_roulette') return;
-
-                const target = room.players.find(p => p.id === room.gageTargetPlayerId);
-                if (target) {
-                    target.needsToDrink = false;
-                    target.sipsToDrink = 0;
-                    target.validations = 0;
-                    target.hasValidated = [];
-                }
-                
-                // Check if others still need to drink
-                const othersDrinking = room.players.filter(p => p.needsToDrink);
-                if (othersDrinking.length === 0) {
-                    room.gameState = 'lobby';
-                } else {
-                    room.gameState = 'drinking_check';
-                }
-                room.proposedGages = [];
-                room.gageTargetPlayerId = null;
+                room.gameState = 'gage_result';
                 broadcastUpdate(roomId);
-            }, 8000); 
+
+                // Phase 2: Result display (5s)
+                setTimeout(() => {
+                    if (room.gameState !== 'gage_result') return;
+                    
+                    const target = room.players.find(p => p.id === room.gageTargetPlayerId);
+                    if (target) {
+                        target.needsToDrink = false;
+                        target.sipsToDrink = 0;
+                        target.validations = 0;
+                        target.hasValidated = [];
+                    }
+                    
+                    const othersDrinking = room.players.filter(p => p.needsToDrink);
+                    room.gameState = othersDrinking.length === 0 ? 'lobby' : 'drinking_check';
+                    
+                    room.proposedGages = [];
+                    room.gageTargetPlayerId = null;
+                    room.lastGageResult = null;
+                    broadcastUpdate(roomId);
+                }, 5000);
+            }, 6000); 
         }
     });
 

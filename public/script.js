@@ -151,7 +151,7 @@ socket.on('updateState', (state) => {
     renderOtherPlayers(state);
     renderCheatMenu(state);
     handleGameState(state);
-    renderGageSystem(state); // <--- L'OUBLI ÉTAIT ICI
+    renderGageSystem(state); 
 });
 
 function getSuitSymbol(suit) {
@@ -508,17 +508,17 @@ window.sendGageProposal = function() {
     }
 };
 
+let currentlyAnimatingGage = null;
+
 function renderGageSystem(state) {
     if (state.gameState === 'proposing_gages') {
-        const isTarget = state.gageTargetPlayerId === socket.id;
-        
+        currentlyAnimatingGage = null; 
         gageOverlay.classList.remove('hidden');
-        gageBox.style.display = 'block'; // Force block display
-        gageBox.classList.remove('hidden'); 
-        
-        gageResultBox.classList.add('hidden');
+        gageBox.classList.remove('hidden');
         rouletteDisplay.classList.add('hidden');
-        
+        gageResultBox.classList.add('hidden');
+
+        const isTarget = state.gageTargetPlayerId === socket.id;
         if (isTarget) {
             gageProposeArea.classList.add('hidden');
             gageSentArea.classList.add('hidden');
@@ -526,7 +526,6 @@ function renderGageSystem(state) {
         } else {
             gageWaitArea.classList.add('hidden');
             const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
-            
             if (hasProposed) {
                 gageProposeArea.classList.add('hidden');
                 gageSentArea.classList.remove('hidden');
@@ -534,36 +533,44 @@ function renderGageSystem(state) {
                 gageProposeArea.classList.remove('hidden');
                 gageSentArea.classList.add('hidden');
             }
-            
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
-    } else if (state.gameState === 'gage_roulette') {
+    } 
+    else if (state.gameState === 'gage_roulette') {
         gageOverlay.classList.remove('hidden');
         gageBox.classList.add('hidden');
-    } else {
+        rouletteDisplay.classList.remove('hidden');
+        gageResultBox.classList.add('hidden');
+
+        if (state.lastGageResult && currentlyAnimatingGage !== state.lastGageResult.gage) {
+            currentlyAnimatingGage = state.lastGageResult.gage;
+            startRouletteAnimation(state.lastGageResult.gage);
+        }
+    } 
+    else if (state.gameState === 'gage_result') {
+        gageOverlay.classList.remove('hidden');
+        gageBox.classList.add('hidden');
+        rouletteDisplay.classList.add('hidden');
+        gageResultBox.classList.remove('hidden');
+
+        if (state.lastGageResult) {
+            gageResultText.textContent = state.lastGageResult.gage;
+            gageResultInfo.textContent = `Pour ${state.lastGageResult.targetName} — Proposé par ${state.lastGageResult.proposer}`;
+        }
+    } 
+    else {
         gageOverlay.classList.add('hidden');
+        currentlyAnimatingGage = null;
     }
 }
 
-// Fixed listeners
-
-socket.on('gageResult', (data) => {
-    // Show only for target room
-    if (socket.roomId && data.roomId !== socket.roomId) return;
-
-    gageBox.classList.add('hidden');
-    rouletteDisplay.classList.remove('hidden');
-    gageOverlay.classList.remove('hidden');
-    
-    // Setup roulette items (visual trick)
-    const items = ["?", "...", "???", data.gage, "Presque!", "Pas de bol", "Ouch", data.gage, data.gage];
-    // Shuffle items for visual variety
+function startRouletteAnimation(winnerGage) {
+    const items = ["?", "...", "???", winnerGage, "Presque!", "Pas de bol", "Ouch", winnerGage, winnerGage];
     for (let i = items.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [items[i], items[j]] = [items[j], items[i]];
     }
-    // Make sure data.gage is at the end for the spin effect
-    items.push(data.gage);
+    items.push(winnerGage);
     
     rouletteAnimation.innerHTML = '';
     items.forEach(it => {
@@ -573,7 +580,6 @@ socket.on('gageResult', (data) => {
         rouletteAnimation.appendChild(div);
     });
     
-    // Trigger animation
     rouletteAnimation.style.transition = 'none';
     rouletteAnimation.style.transform = 'translateX(0)';
     setTimeout(() => {
@@ -582,11 +588,8 @@ socket.on('gageResult', (data) => {
         const centerOffset = (rouletteDisplay.offsetWidth / 2) - 100;
         rouletteAnimation.style.transform = `translateX(-${stopPos - centerOffset}px)`;
     }, 50);
-    
-    setTimeout(() => {
-        rouletteDisplay.classList.add('hidden');
-        gageResultBox.classList.remove('hidden');
-        gageResultText.textContent = data.gage;
-        gageResultInfo.textContent = `Pour ${data.targetName} — Proposé par ${data.proposer}`;
-    }, 6000);
-});
+}
+
+// Fixed listeners
+
+// Fin du fichier
