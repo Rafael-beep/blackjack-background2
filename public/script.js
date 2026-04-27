@@ -4,7 +4,9 @@ const SERVER_URL = window.location.hostname === 'localhost' || window.location.h
     ? 'http://localhost:3000' 
     : 'https://blackjack-background2.onrender.com';
 
-const socket = io(SERVER_URL);
+const socket = io(SERVER_URL, {
+    transports: ['websocket', 'polling']
+});
 
 // DOM Elements
 const lobbyScreen = document.getElementById('lobby-screen');
