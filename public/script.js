@@ -535,13 +535,12 @@ function renderGageSystem(state) {
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
 
-        // EVERYONE (including the target) sees the button if there is at least 1 gage
-        if (state.proposedGages.length > 0) {
-            console.log("Showing Roulette Button! Count:", state.proposedGages.length);
+        // FORCE VISIBILITY IF GAGES EXIST
+        if (state.proposedGages && state.proposedGages.length > 0) {
+            console.log("!!! ROULETTE READY !!! Count:", state.proposedGages.length);
+            btnSpinRoulette.style.setProperty('display', 'block', 'important');
             btnSpinRoulette.classList.remove('hidden');
-            btnSpinRoulette.style.display = 'block'; // Force visibility
         } else {
-            btnSpinRoulette.classList.add('hidden');
             btnSpinRoulette.style.display = 'none';
         }
     } else if (state.gameState !== 'gage_roulette') {
