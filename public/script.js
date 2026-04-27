@@ -532,15 +532,21 @@ function renderGageSystem(state) {
         document.getElementById('rouletteDisplay').classList.add('hidden');
         document.getElementById('gageResultBox').classList.add('hidden');
 
-        const isTarget = state.gageTargetPlayerId === socket.id;
+        const me = state.players.find(p => p.id === socket.id);
+        const targetPlayer = state.players.find(p => p.id === state.gageTargetPlayerId);
+        
+        const isTarget = me && targetPlayer && me.name === targetPlayer.name;
         
         if (isTarget) {
-            gageProposeArea.classList.add('hidden');
-            gageSentArea.classList.add('hidden');
-            gageWaitArea.classList.remove('hidden');
+            document.getElementById('gageProposeArea').classList.add('hidden');
+            document.getElementById('gageSentArea').classList.add('hidden');
+            document.getElementById('gageWaitArea').classList.remove('hidden');
         } else {
-            gageWaitArea.classList.add('hidden');
-            const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
+            document.getElementById('gageWaitArea').classList.add('hidden');
+            const hasProposed = state.proposedGages.some(g => {
+                const gPlayer = state.players.find(p => p.id === g.playerId);
+                return gPlayer && me && gPlayer.name === me.name;
+            });
             if (hasProposed) {
                 gageProposeArea.classList.add('hidden');
                 gageSentArea.classList.remove('hidden');

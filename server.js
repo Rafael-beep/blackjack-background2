@@ -558,11 +558,17 @@ io.on('connection', (socket) => {
         
         console.log(`[GAGE] Room ${roomId}: Proposal "${gage}" from ${socket.id}`);
 
-        // Target can't propose a gage for themselves
-        if (socket.id === room.gageTargetPlayerId) return;
+        const targetPlayer = room.players.find(p => p.id === room.gageTargetPlayerId);
+        const proposingPlayer = room.players.find(p => p.id === socket.id);
+
+        // Block if it's the target user (checked by name to handle reconnections/multiple tabs)
+        if (targetPlayer && proposingPlayer && targetPlayer.name === proposingPlayer.name) return;
         
-        // Prevent multiple proposals from same player
-        if (room.proposedGages.some(g => g.playerId === socket.id)) return;
+        // Prevent multiple proposals from same player (checked by name)
+        if (room.proposedGages.some(g => {
+            const gPlayer = room.players.find(p => p.id === g.playerId);
+            return gPlayer && proposingPlayer && gPlayer.name === proposingPlayer.name;
+        })) return;
 
         room.proposedGages.push({
             playerId: socket.id,
