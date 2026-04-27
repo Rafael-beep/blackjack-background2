@@ -237,6 +237,7 @@ io.on('connection', (socket) => {
             powersEnabled: true,
             proposedGages: [],
             gageTargetPlayerId: null,
+            gageTargetPlayerName: null,
             activeGageData: null 
         };
 
@@ -546,6 +547,7 @@ io.on('connection', (socket) => {
         if (player && player.needsToDrink) {
             room.gameState = 'proposing_gages';
             room.gageTargetPlayerId = player.id;
+            room.gageTargetPlayerName = player.name;
             room.proposedGages = [];
             broadcastUpdate(roomId);
         }
@@ -558,11 +560,10 @@ io.on('connection', (socket) => {
         
         console.log(`[GAGE] Room ${roomId}: Proposal "${gage}" from ${socket.id}`);
 
-        const targetPlayer = room.players.find(p => p.id === room.gageTargetPlayerId);
         const proposingPlayer = room.players.find(p => p.id === socket.id);
 
         // Block if it's the target user (checked by name to handle reconnections/multiple tabs)
-        if (targetPlayer && proposingPlayer && targetPlayer.name === proposingPlayer.name) return;
+        if (proposingPlayer && room.gageTargetPlayerName === proposingPlayer.name) return;
         
         // Prevent multiple proposals from same player (checked by name)
         if (room.proposedGages.some(g => {
@@ -572,7 +573,7 @@ io.on('connection', (socket) => {
 
         room.proposedGages.push({
             playerId: socket.id,
-            playerName: room.players.find(p => p.id === socket.id)?.name || 'Anonyme',
+            playerName: proposingPlayer ? proposingPlayer.name : 'Anonyme',
             text: gage
         });
 
@@ -676,6 +677,7 @@ const getPublicRoomState = (room, playerId) => {
         powersEnabled: room.powersEnabled,
         proposedGages: room.proposedGages,
         gageTargetPlayerId: room.gageTargetPlayerId,
+        gageTargetPlayerName: room.gageTargetPlayerName,
         players: room.players.map(p => {
             const isMe = p.id === playerId;
             return {
