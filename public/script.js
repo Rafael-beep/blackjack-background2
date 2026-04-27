@@ -510,6 +510,7 @@ function renderGageSystem(state) {
     
     if (state.gameState === 'proposing_gages') {
         gageOverlay.classList.remove('hidden');
+        gageBox.classList.remove('hidden'); // CRITICAL: Reset visibility for 2nd game
         gageResultBox.classList.add('hidden');
         rouletteDisplay.classList.add('hidden');
         
