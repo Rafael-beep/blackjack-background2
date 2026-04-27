@@ -2,7 +2,7 @@
 // Change this URL to your Render URL after deployment!
 const SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:3000' 
-    : 'https://votre-projet-render.onrender.com'; // <--- REMPLACEZ PAR VOTRE URL RENDER
+    : 'https://blackjack-background2.onrender.com';
 
 const socket = io(SERVER_URL);
 
