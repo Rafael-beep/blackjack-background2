@@ -558,8 +558,8 @@ io.on('connection', (socket) => {
         
         console.log(`[GAGE] Room ${roomId}: Proposal "${gage}" from ${socket.id}`);
 
-        // On autorise maintenant TOUT LE MONDE à proposer (même la cible)
-        // car c'est plus simple et plus fun.
+        // Target can't propose a gage for themselves
+        if (socket.id === room.gageTargetPlayerId) return;
         
         // Prevent multiple proposals from same player
         if (room.proposedGages.some(g => g.playerId === socket.id)) return;

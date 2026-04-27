@@ -527,24 +527,29 @@ function renderGageSystem(state) {
 
     document.getElementById('gageOverlay').classList.remove('hidden');
 
-    // 1. Phase de PROPOSITION
     if (state.gameState === 'proposing_gages') {
         document.getElementById('gageBox').classList.remove('hidden');
         document.getElementById('rouletteDisplay').classList.add('hidden');
         document.getElementById('gageResultBox').classList.add('hidden');
 
-        // On n'affiche plus l'écran d'attente pour la cible, tout le monde peut proposer
-        gageWaitArea.classList.add('hidden');
+        const isTarget = state.gageTargetPlayerId === socket.id;
         
-        const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
-        if (hasProposed) {
+        if (isTarget) {
             gageProposeArea.classList.add('hidden');
-            gageSentArea.classList.remove('hidden');
-        } else {
-            gageProposeArea.classList.remove('hidden');
             gageSentArea.classList.add('hidden');
+            gageWaitArea.classList.remove('hidden');
+        } else {
+            gageWaitArea.classList.add('hidden');
+            const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
+            if (hasProposed) {
+                gageProposeArea.classList.add('hidden');
+                gageSentArea.classList.remove('hidden');
+            } else {
+                gageProposeArea.classList.remove('hidden');
+                gageSentArea.classList.add('hidden');
+            }
+            document.getElementById('proposalsCount').textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
-        document.getElementById('proposalsCount').textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
     } 
     else if (state.gameState === 'gage_roulette') {
         document.getElementById('gageBox').classList.add('hidden');
