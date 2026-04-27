@@ -543,13 +543,16 @@ function renderGageSystem(state) {
         rouletteDisplay.classList.remove('hidden');
         gageResultBox.classList.add('hidden');
 
-        if (state.lastGageResult && currentlyAnimatingGage !== state.lastGageResult.gage) {
-            currentlyAnimatingGage = state.lastGageResult.gage;
-            console.log("Démarrage animation pour :", currentlyAnimatingGage);
-            // On attend que le DOM soit prêt pour calculer les dimensions
-            setTimeout(() => {
-                startRouletteAnimation(state.lastGageResult.gage);
-            }, 100);
+        if (state.lastGageResult && state.lastGageResult.gage) {
+            if (currentlyAnimatingGage !== state.lastGageResult.gage) {
+                currentlyAnimatingGage = state.lastGageResult.gage;
+                console.log("Démarrage animation pour :", currentlyAnimatingGage);
+                setTimeout(() => {
+                    startRouletteAnimation(state.lastGageResult.gage);
+                }, 100);
+            }
+        } else {
+            console.warn("Gage de roulette manquant dans l'état !");
         }
     } 
     else if (state.gameState === 'gage_result') {
@@ -558,9 +561,11 @@ function renderGageSystem(state) {
         rouletteDisplay.classList.add('hidden');
         gageResultBox.classList.remove('hidden');
 
-        if (state.lastGageResult) {
+        if (state.lastGageResult && state.lastGageResult.gage) {
             gageResultText.textContent = state.lastGageResult.gage;
             gageResultInfo.textContent = `Pour ${state.lastGageResult.targetName} — Proposé par ${state.lastGageResult.proposer}`;
+        } else {
+            gageResultText.textContent = "Erreur : Gage introuvable";
         }
     } 
     else {

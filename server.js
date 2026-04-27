@@ -580,6 +580,8 @@ io.on('connection', (socket) => {
         if (room.gameState === 'proposing_gages' && room.proposedGages.length > 0) {
             const winnerGage = room.proposedGages[Math.floor(Math.random() * room.proposedGages.length)];
             
+            console.log(`[ROULETTE] Room ${roomId}: Winner chosen -> "${winnerGage.text}" by ${winnerGage.playerName}`);
+
             room.gameState = 'gage_roulette';
             room.lastGageResult = {
                 gage: winnerGage.text,
