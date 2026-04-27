@@ -481,6 +481,32 @@ btnUseLache.addEventListener('click', () => {
     }
 });
 
+// GLOBAL GAGE PROPOSAL FUNCTION
+window.sendGageProposal = function() {
+    const input = document.getElementById('gageInput');
+    const val = input.value.trim();
+    if (val) {
+        console.log("Sending gage proposal:", val);
+        socket.emit('proposeGage', { gage: val });
+        input.value = '';
+        
+        // Visual feedback to show it's working
+        const btn = document.getElementById('btnSendGage');
+        if (btn) {
+            btn.textContent = "Envoyé ! ✅";
+            btn.style.background = "#10b981";
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.textContent = "Envoyer 📤";
+                btn.style.background = "";
+                btn.disabled = false;
+            }, 2000);
+        }
+    } else {
+        alert("Tu dois écrire quelque chose !");
+    }
+};
+
 function renderGageSystem(state) {
     const isTarget = state.gageTargetPlayerId === socket.id;
     const isCreator = state.players.length > 0 && state.players[0].id === socket.id;
@@ -520,14 +546,6 @@ function renderGageSystem(state) {
 }
 
 // Fixed listeners
-btnSendGage.addEventListener('click', () => {
-    const val = gageInput.value.trim();
-    if (val) {
-        socket.emit('proposeGage', { gage: val });
-        gageInput.value = '';
-    }
-});
-
 btnSpinRoulette.addEventListener('click', () => {
     socket.emit('spinGageRoulette');
 });

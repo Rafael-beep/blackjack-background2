@@ -552,6 +552,8 @@ io.on('connection', (socket) => {
         if (!roomId || !rooms[roomId]) return;
         const room = rooms[roomId];
         
+        console.log(`[GAGE] Room ${roomId}: Proposal "${gage}" from ${socket.id}`);
+
         // Target can't propose a gage for themselves
         if (socket.id === room.gageTargetPlayerId) return;
         
