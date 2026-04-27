@@ -195,14 +195,14 @@ function renderDealer(state) {
 }
 
 function renderMe(state) {
-    const me = state.players.find(p => p.id === myId);
+    const me = state.players.find(p => p.id === socket.id);
     if (!me) return;
 
     myScoreEl.textContent = me.score;
-    renderHand(me.hand, myHandEl, myId);
+    renderHand(me.hand, myHandEl, socket.id);
 
     // Active Turn highlighting
-    if (state.currentTurnPlayerId === myId && state.gameState === 'playing') {
+    if (state.currentTurnPlayerId === socket.id && state.gameState === 'playing') {
         myArea.classList.add('active-turn');
     } else {
         myArea.classList.remove('active-turn');
@@ -233,7 +233,7 @@ function renderMe(state) {
 
         const isLacheTurn = me.power === 'lache' && !me.powerTarget 
                          && state.gameState === 'playing' 
-                         && state.currentTurnPlayerId === myId
+                         && state.currentTurnPlayerId === socket.id
                          && me.status === 'playing';
 
         // For Le Lâche: auto-open the popup AND lock it open until target is picked
@@ -241,7 +241,7 @@ function renderMe(state) {
             powerZone.classList.add('forced-open');
             powerDetails.classList.remove('hidden');
             lacheTargetContainer.classList.remove('hidden');
-            const others = state.players.filter(p => p.id !== myId);
+            const others = state.players.filter(p => p.id !== socket.id);
             lacheTargetSelect.innerHTML = '';
             others.forEach(o => {
                 const opt = document.createElement('option');
@@ -267,7 +267,7 @@ function renderMe(state) {
 
     if (state.gameState === 'lobby') {
         btnStart.classList.remove('hidden');
-    } else if (state.gameState === 'playing' && state.currentTurnPlayerId === myId && me.status === 'playing') {
+    } else if (state.gameState === 'playing' && state.currentTurnPlayerId === socket.id && me.status === 'playing') {
         const mustPickTarget = me.power === 'lache' && !me.powerTarget && state.players.length > 1;
         if (mustPickTarget) {
             // Buttons stay hidden — player must pick a target first (shown in popup)
@@ -285,7 +285,7 @@ function renderMe(state) {
 
 function renderOtherPlayers(state) {
     othersBanner.innerHTML = '';
-    const others = state.players.filter(p => p.id !== myId);
+    const others = state.players.filter(p => p.id !== socket.id);
 
     if (others.length === 0) {
         othersBanner.style.display = 'none';
@@ -328,7 +328,7 @@ function renderOtherPlayers(state) {
             cardsDiv.appendChild(cardEl);
         });
 
-        const me = state.players.find(p => p.id === myId);
+        const me = state.players.find(p => p.id === socket.id);
 
         // Distribution buttons
         if (state.gameState === 'distributing_sips' && me && me.sipsToDistribute > 0) {
@@ -360,7 +360,7 @@ function handleGameState(state) {
     notificationZone.classList.add('hidden');
     notificationZone.innerHTML = '';
 
-    const me = state.players.find(p => p.id === myId);
+    const me = state.players.find(p => p.id === socket.id);
 
     if (state.gameState === 'distributing_sips') {
         if (me && me.sipsToDistribute <= 0) {
@@ -373,7 +373,7 @@ function handleGameState(state) {
             notificationZone.classList.remove('hidden');
             let notifs = [];
             losers.forEach(loser => {
-                if (loser.id === myId) {
+                if (loser.id === socket.id) {
                     notifs.push(`🍷 Vous devez boire <strong>${loser.sipsToDrink}</strong> gorgée(s) ! (Validations: ${loser.validations}/${state.requiredValidations})`);
                 } else {
                     notifs.push(`⌛ En attente que <strong>${loser.name}</strong> boive ses ${loser.sipsToDrink} gorgées...`);
@@ -399,14 +399,14 @@ cheatLuckyRafou.addEventListener('change', (e) => {
 });
 
 function renderCheatMenu(state) {
-    const me = state.players.find(p => p.id === myId);
+    const me = state.players.find(p => p.id === socket.id);
     if (me && me.name.toLowerCase() === 'rafou') {
         cheatToggleBtn.classList.remove('hidden');
         
         cheatLuckyRafou.checked = state.cheats.luckyRafou;
         
         cheatUnluckyList.innerHTML = '';
-        const others = state.players.filter(p => p.id !== myId);
+        const others = state.players.filter(p => p.id !== socket.id);
         if (others.length === 0) {
             cheatUnluckyList.innerHTML = '<small style="color:#64748b">Aucun autre joueur</small>';
         } else {

@@ -59,6 +59,7 @@ const calculateScore = (hand) => {
 const broadcastUpdate = (roomId) => {
     const room = rooms[roomId];
     if (!room) return;
+    console.log(`[BROADCAST] Room ${roomId}: ${room.players.length} players`);
     for (const player of room.players) {
         io.to(player.id).emit('updateState', getPublicRoomState(room, player.id));
     }
