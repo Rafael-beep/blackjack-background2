@@ -772,3 +772,46 @@ h3 span {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+
+/* Tasty Croustyx UI Option */
+body.tasty-croustyx {
+    background-image: url("crousty/SUMMER+VIBES+TASTY+CROUSTY.webp") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+body.tasty-croustyx .screen {
+    background: rgba(255, 105, 180, 0.75) !important;
+    border-color: #ff1493 !important;
+    box-shadow: 0 25px 50px -12px rgba(255, 20, 147, 0.5), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+}
+
+body.tasty-croustyx .card {
+    background-image: url("crousty/téléchargement (1).jfif") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    color: white !important;
+    text-shadow: 1px 1px 2px black, 0 0 10px #ff00ff !important;
+    border-color: #ff1493 !important;
+}
+
+body.tasty-croustyx .card.hidden-card {
+    background-image: url("crousty/téléchargement (2).jfif") !important;
+    background-size: cover !important;
+}
+
+body.tasty-croustyx h1, body.tasty-croustyx h2, body.tasty-croustyx h3 {
+    text-shadow: 2px 2px 4px #ff1493 !important;
+    color: white !important;
+}
+
+body.tasty-croustyx .btn.primary {
+    background-color: #ff1493 !important;
+    box-shadow: 0 4px 14px 0 rgba(255, 20, 147, 0.5) !important;
+}
+
+body.tasty-croustyx .btn.primary:hover:not(:disabled) {
+    background-color: #ff69b4 !important;
+}

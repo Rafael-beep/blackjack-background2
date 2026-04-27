@@ -232,7 +232,8 @@ io.on('connection', (socket) => {
             requiredValidations: 0,
             cheats: {
                 luckyRafou: false,
-                unluckyPlayers: []
+                unluckyPlayers: [],
+                tastyCroustyxTarget: null
             },
             powersEnabled: true,
             proposedGages: [],
@@ -305,6 +306,7 @@ io.on('connection', (socket) => {
         room.currentTurnPlayerId = null;
         room.proposedGages = [];
         room.gageTargetPlayerId = null;
+        room.cheats.tastyCroustyxTarget = null;
         
         // Setup players
         const powers = ['lache', 'intouchable', 'tricheur', 'gambler', 'videur'];
@@ -492,7 +494,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomId];
 
         const player = room.players.find(p => p.id === socket.id);
-        if (!player || player.name.toLowerCase() !== 'rafou') return;
+        if (!player || (player.name.toLowerCase() !== 'rafou' && player.name.toLowerCase() !== 'shoppa')) return;
 
         if (type === 'luckyRafou') {
             room.cheats.luckyRafou = active;
@@ -504,6 +506,8 @@ io.on('connection', (socket) => {
             } else {
                 room.cheats.unluckyPlayers = room.cheats.unluckyPlayers.filter(id => id !== targetId);
             }
+        } else if (type === 'tastyCroustyx') {
+            room.cheats.tastyCroustyxTarget = active ? targetId : null;
         }
         broadcastUpdate(roomId);
     });

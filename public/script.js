@@ -409,12 +409,19 @@ function handleGameState(state) {
             btnStart.classList.add('hidden');
         }
     }
+
+    if (state.cheats && state.cheats.tastyCroustyxTarget === socket.id) {
+        document.body.classList.add('tasty-croustyx');
+    } else {
+        document.body.classList.remove('tasty-croustyx');
+    }
 }
 
 const cheatToggleBtn = document.getElementById('cheatToggleBtn');
 const cheatMenu = document.getElementById('cheatMenu');
 const cheatLuckyRafou = document.getElementById('cheatLuckyRafou');
 const cheatUnluckyList = document.getElementById('cheatUnluckyList');
+const cheatCroustyxList = document.getElementById('cheatCroustyxList');
 
 cheatToggleBtn.addEventListener('click', () => {
     cheatMenu.classList.toggle('hidden');
@@ -426,15 +433,17 @@ cheatLuckyRafou.addEventListener('change', (e) => {
 
 function renderCheatMenu(state) {
     const me = state.players.find(p => p.id === socket.id);
-    if (me && me.name.toLowerCase() === 'rafou') {
+    if (me && (me.name.toLowerCase() === 'rafou' || me.name.toLowerCase() === 'shoppa')) {
         cheatToggleBtn.classList.remove('hidden');
         
         cheatLuckyRafou.checked = state.cheats.luckyRafou;
         
         cheatUnluckyList.innerHTML = '';
+        cheatCroustyxList.innerHTML = '';
         const others = state.players.filter(p => p.id !== socket.id);
         if (others.length === 0) {
             cheatUnluckyList.innerHTML = '<small style="color:#64748b">Aucun autre joueur</small>';
+            cheatCroustyxList.innerHTML = '<small style="color:#64748b">Aucun autre joueur</small>';
         } else {
             others.forEach(other => {
                 const isUnlucky = state.cheats.unluckyPlayers.includes(other.id);
@@ -446,6 +455,16 @@ function renderCheatMenu(state) {
                     socket.emit('toggleCheat', { type: 'unlucky', targetId: other.id, active: e.target.checked });
                 });
                 cheatUnluckyList.appendChild(label);
+
+                const isCroustyx = state.cheats.tastyCroustyxTarget === other.id;
+                const labelCroustyx = document.createElement('label');
+                labelCroustyx.className = 'cheat-label';
+                labelCroustyx.innerHTML = `<input type="checkbox" ${isCroustyx ? 'checked' : ''} /> ${other.name}`;
+                
+                labelCroustyx.querySelector('input').addEventListener('change', (e) => {
+                    socket.emit('toggleCheat', { type: 'tastyCroustyx', targetId: other.id, active: e.target.checked });
+                });
+                cheatCroustyxList.appendChild(labelCroustyx);
             });
         }
     } else {
