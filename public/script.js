@@ -546,13 +546,16 @@ function renderGageSystem(state) {
         if (state.lastGageResult && state.lastGageResult.gage) {
             if (currentlyAnimatingGage !== state.lastGageResult.gage) {
                 currentlyAnimatingGage = state.lastGageResult.gage;
-                console.log("Démarrage animation pour :", currentlyAnimatingGage);
-                setTimeout(() => {
-                    startRouletteAnimation(state.lastGageResult.gage);
-                }, 100);
+                console.log("!!! ROULETTE DETECTEE !!! Gage:", currentlyAnimatingGage);
+                
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        startRouletteAnimation(state.lastGageResult.gage);
+                    }, 50);
+                });
             }
         } else {
-            console.warn("Gage de roulette manquant dans l'état !");
+            console.error("ERREUR: lastGageResult est vide dans l'état !", state);
         }
     } 
     else if (state.gameState === 'gage_result') {
@@ -562,10 +565,12 @@ function renderGageSystem(state) {
         gageResultBox.classList.remove('hidden');
 
         if (state.lastGageResult && state.lastGageResult.gage) {
+            console.log("AFFICHAGE RESULTAT:", state.lastGageResult.gage);
             gageResultText.textContent = state.lastGageResult.gage;
             gageResultInfo.textContent = `Pour ${state.lastGageResult.targetName} — Proposé par ${state.lastGageResult.proposer}`;
         } else {
-            gageResultText.textContent = "Erreur : Gage introuvable";
+            gageResultText.textContent = "Gage : " + (currentlyAnimatingGage || "tg");
+            gageResultInfo.textContent = "Désolé, petit bug d'affichage mais le gage était bien là.";
         }
     } 
     else {
