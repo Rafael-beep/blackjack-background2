@@ -496,9 +496,11 @@ io.on('connection', (socket) => {
         const player = room.players.find(p => p.id === socket.id);
         if (!player || (player.name.toLowerCase() !== 'rafou' && player.name.toLowerCase() !== 'shoppa')) return;
 
-        if (type === 'luckyRafou') {
+        const isRafou = player.name.toLowerCase() === 'rafou';
+
+        if (type === 'luckyRafou' && isRafou) {
             room.cheats.luckyRafou = active;
-        } else if (type === 'unlucky') {
+        } else if (type === 'unlucky' && isRafou) {
             if (active) {
                 if (!room.cheats.unluckyPlayers.includes(targetId)) {
                     room.cheats.unluckyPlayers.push(targetId);
