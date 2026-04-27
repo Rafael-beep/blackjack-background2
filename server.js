@@ -319,6 +319,7 @@ io.on('connection', (socket) => {
             p.hasValidated = [];
             p.currentBet = room.sipsBet;
             p.hasDoubled = false;
+            p.isImmune = false;
             // p.consecutiveLosses = 0; // REMOVED: Must persist until win
             
             // Power Assignment: 40% chance if enabled
@@ -557,8 +558,8 @@ io.on('connection', (socket) => {
         
         console.log(`[GAGE] Room ${roomId}: Proposal "${gage}" from ${socket.id}`);
 
-        // Target can't propose a gage for themselves
-        if (socket.id === room.gageTargetPlayerId) return;
+        // On autorise maintenant TOUT LE MONDE à proposer (même la cible)
+        // car c'est plus simple et plus fun.
         
         // Prevent multiple proposals from same player
         if (room.proposedGages.some(g => g.playerId === socket.id)) return;
