@@ -537,9 +537,12 @@ function renderGageSystem(state) {
 
         // EVERYONE (including the target) sees the button if there is at least 1 gage
         if (state.proposedGages.length > 0) {
+            console.log("Showing Roulette Button! Count:", state.proposedGages.length);
             btnSpinRoulette.classList.remove('hidden');
+            btnSpinRoulette.style.display = 'block'; // Force visibility
         } else {
             btnSpinRoulette.classList.add('hidden');
+            btnSpinRoulette.style.display = 'none';
         }
     } else if (state.gameState !== 'gage_roulette') {
         gageOverlay.classList.add('hidden');
