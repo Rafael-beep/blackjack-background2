@@ -301,6 +301,8 @@ io.on('connection', (socket) => {
         room.dealerHand = [];
         room.gameState = 'playing';
         room.currentTurnPlayerId = null;
+        room.proposedGages = [];
+        room.gageTargetPlayerId = null;
         
         // Setup players
         const powers = ['lache', 'intouchable', 'tricheur', 'gambler', 'videur'];
@@ -589,6 +591,10 @@ io.on('connection', (socket) => {
 
             // Back to drinking check or lobby after a short delay
             setTimeout(() => {
+                // SAFETY CHECK: Only reset if we are still in the roulette phase
+                // or if the target still exists. If a new game started, don't touch anything!
+                if (room.gameState !== 'gage_roulette') return;
+
                 const target = room.players.find(p => p.id === room.gageTargetPlayerId);
                 if (target) {
                     target.needsToDrink = false;
