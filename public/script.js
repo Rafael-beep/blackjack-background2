@@ -98,6 +98,7 @@ btnCreateRoom.addEventListener('click', () => {
         lobbyError.textContent = "Veuillez entrer un nom de salle.";
         return;
     }
+    socket.roomId = roomId; // Store it locally for filtering
     socket.emit('createRoom', { roomId, playerName, sipsBet });
 });
 
@@ -109,6 +110,7 @@ btnJoinRoom.addEventListener('click', () => {
         lobbyError.textContent = "Veuillez entrer un nom de salle.";
         return;
     }
+    socket.roomId = roomId; // Store it locally for filtering
     socket.emit('joinRoom', { roomId, playerName });
 });
 

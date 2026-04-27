@@ -318,7 +318,7 @@ io.on('connection', (socket) => {
             p.hasValidated = [];
             p.currentBet = room.sipsBet;
             p.hasDoubled = false;
-            p.consecutiveLosses = 0;
+            // p.consecutiveLosses = 0; // REMOVED: Must persist until win
             
             // Power Assignment: 40% chance if enabled
             p.power = null;
