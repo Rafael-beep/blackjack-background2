@@ -389,13 +389,13 @@ function handleGameState(state) {
             losers.forEach(loser => {
                 if (loser.id === socket.id) {
                     notifs.push(`
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            <span>🍷 Vous devez boire <strong>${loser.sipsToDrink}</strong> gorgée(s) !</span>
-                            <div style="display:flex; gap:10px; justify-content:center;">
-                                <button class="btn success" onclick="socket.emit('validateDrink', socket.id)">J'ai bu ✅</button>
-                                <button class="btn warning" onclick="socket.emit('chooseGage')" style="background:#eab308; color:black;">Je préfère un gage 🎰</button>
+                        <div class="drinking-box" style="display:flex; flex-direction:column; gap:15px; background: rgba(225, 29, 72, 0.1); padding: 20px; border-radius: 15px; border: 1px solid var(--primary);">
+                            <span style="font-size: 1.2rem;">🍷 Vous devez boire <strong>${loser.sipsToDrink}</strong> gorgée(s) !</span>
+                            <div style="display:flex; gap:12px; justify-content:center; flex-wrap: wrap;">
+                                <button class="btn success" onclick="socket.emit('validateDrink', socket.id)" style="min-width: 140px;">C'est fait ✅</button>
+                                <button class="btn warning" onclick="socket.emit('chooseGage')" style="min-width: 140px;">🎰 ROULETTE GAGE</button>
                             </div>
-                            <small>(Validations: ${loser.validations}/${state.requiredValidations})</small>
+                            <small style="color: var(--text-dim)">Besoin de ${state.requiredValidations} validations de vos amis.</small>
                         </div>
                     `);
                 } else {
