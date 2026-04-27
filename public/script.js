@@ -534,7 +534,8 @@ function renderGageSystem(state) {
             
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
             
-            if (isCreator && state.proposedGages.length > 0) {
+            // Allow ANYONE to launch the roulette if there is at least one gage
+            if (state.proposedGages.length > 0) {
                 btnSpinRoulette.classList.remove('hidden');
             } else {
                 btnSpinRoulette.classList.add('hidden');
