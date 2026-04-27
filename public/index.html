@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drinkjack - Blackjack de Soirée</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="screen">
+            <h1>🍷 Drinkjack</h1>
+            <p>Le Blackjack qui vous fait boire.</p>
+            <div class="form-group">
+                <input type="text" id="playerName" placeholder="Votre pseudo" />
+            </div>
+            <div class="form-group">
+                <input type="text" id="roomId" placeholder="Nom de la salle" />
+            </div>
+            <div class="form-group">
+                <label for="sipsBet">Mise (Gorgées) :</label>
+                <input type="number" id="sipsBet" value="5" min="1" max="20" />
+            </div>
+            <div class="form-group checkbox-group" id="powersToggleContainer">
+                <label for="powersEnabled">Pouvoirs Secrets ✨</label>
+                <input type="checkbox" id="powersEnabled" checked />
+            </div>
+            <div class="buttons">
+                <button id="btnCreateRoom" class="btn primary">Créer la salle</button>
+                <button id="btnJoinRoom" class="btn secondary">Rejoindre</button>
+            </div>
+            <p id="lobbyError" class="error-text"></p>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <!-- Power Zone (Top Left) - Collapsible -->
+            <div id="powerZone" class="power-zone hidden">
+                <button id="powerToggleBtn" class="power-toggle-btn" title="Voir mon pouvoir">✨</button>
+                <div id="powerDetails" class="power-details hidden">
+                    <h4 id="powerTitle">Pouvoir Secret</h4>
+                    <p id="powerDescription"></p>
+                    <div id="lacheTargetContainer" class="hidden" style="margin-top: 10px;">
+                        <select id="lacheTargetSelect" style="padding: 5px; font-size: 0.9rem; margin-bottom: 5px; width: 100%; background: rgba(0,0,0,0.4); color: white; border: 1px solid rgba(139,92,246,0.4); border-radius: 8px;"></select>
+                        <button id="btnUseLache" class="btn action" style="width: 100%; margin-top: 4px; font-size: 0.85rem; padding: 8px;">Cibler cette victime 🎯</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="cheatToggleBtn" class="cheat-toggle hidden" title="Menu Secret">🕵️</button>
+            <div id="cheatMenu" class="cheat-menu hidden">
+                <h4>🛠️ Menu de Triche</h4>
+                <label class="cheat-label">
+                    <input type="checkbox" id="cheatLuckyRafou" /> Mode Chance (Je gagne direct)
+                </label>
+                <h5>Malchance (Force Bust) :</h5>
+                <div id="cheatUnluckyList" class="cheat-list"></div>
+            </div>
+
+            <div class="header">
+                <h2>Salle: <span id="roomNameDisplay"></span></h2>
+                <div class="bet-info">Mise : <span id="sipsBetDisplay"></span> gorgée(s) 🍷</div>
+            </div>
+
+            <!-- Bandeau des autres joueurs -->
+            <div class="others-banner" id="othersBanner">
+                <!-- Mini player badges will be inserted here -->
+            </div>
+
+            <div id="notification-zone" class="notification hidden">
+                <!-- Notifications will appear here -->
+            </div>
+
+            <div class="board">
+                <div class="dealer-area">
+                    <h3>Croupier (<span id="dealerScore">?</span>)</h3>
+                    <div id="dealerHand" class="cards-container"></div>
+                </div>
+
+                <div class="my-area" id="myArea">
+                    <h3>Moi (<span id="myScore">0</span>)</h3>
+                    <div id="myHand" class="cards-container"></div>
+                    
+                    <div id="distributionZone" class="distribution-zone hidden">
+                        <h4>🎯 À vous de distribuer !</h4>
+                        <p>Il vous reste <strong id="sipsToDistributeCount" style="color: #eab308; font-size: 1.2rem;">0</strong> gorgée(s) à donner.</p>
+                        <button id="btnDiscardSips" class="btn danger" style="margin-top: 10px; font-size: 0.8rem; padding: 6px 12px;">Jeter le reste 🗑️</button>
+                    </div>
+
+                    <div class="actions" id="myActions">
+                        <button id="btnStart" class="btn primary hidden">Lancer la manche</button>
+                        <button id="btnHit" class="btn action hidden">Tirer</button>
+                        <button id="btnStand" class="btn action hidden">Rester</button>
+                        <button id="btnDouble" class="btn action hidden" style="background: #eab308; color: black; border: none;">Doubler (x2)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
