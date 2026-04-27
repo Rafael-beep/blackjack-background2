@@ -74,20 +74,28 @@
 
             <!-- Gage System Overlay -->
             <div id="gageOverlay" class="gage-overlay hidden">
-                <div id="proposeGageBox" class="gage-box hidden">
-                    <h3>💡 Proposez un gage !</h3>
-                    <p>Le perdant a choisi un gage... Soyez créatifs.</p>
-                    <input type="text" id="gageInput" placeholder="Ex: Faire 10 pompes" />
-                    <button id="btnSendGage" class="btn primary">Envoyer 📤</button>
-                    <p id="proposalsCount" style="margin-top:10px; font-size:0.9rem; color:var(--text-dim);"></p>
-                    <button id="btnSpinRoulette" class="btn action hidden" style="background:#eab308; color:black; margin-top:10px;">Lancer la Roulette 🎰</button>
+                <div id="gageBox" class="gage-box">
+                    <div id="gageProposeArea">
+                        <h3>💡 Proposez un gage !</h3>
+                        <p>Le perdant a choisi un gage... Soyez créatifs.</p>
+                        <input type="text" id="gageInput" placeholder="Ex: Faire 10 pompes" />
+                        <button id="btnSendGage" class="btn primary">Envoyer 📤</button>
+                        <p id="proposalsCount" style="margin-top:10px; font-size:0.9rem; color:var(--text-dim);"></p>
+                        <button id="btnSpinRoulette" class="btn warning hidden" style="margin-top:10px; width: 100%;">Lancer la Roulette 🎰</button>
+                    </div>
+                    <div id="gageWaitArea" class="hidden">
+                        <h3>⌛ On vous prépare un gage...</h3>
+                        <p>Les autres joueurs sont en train de voter pour votre destin.</p>
+                    </div>
+                    <div id="gageSentArea" class="hidden">
+                        <h3>✅ Proposition envoyée</h3>
+                        <p>Attendez que la roulette soit lancée.</p>
+                    </div>
                 </div>
 
                 <div id="rouletteDisplay" class="roulette-display hidden">
                     <div class="roulette-content">
-                        <div id="rouletteAnimation" class="roulette-animation">
-                            <!-- Items will spin here -->
-                        </div>
+                        <div id="rouletteAnimation" class="roulette-animation"></div>
                         <div class="roulette-pointer">👇</div>
                     </div>
                 </div>

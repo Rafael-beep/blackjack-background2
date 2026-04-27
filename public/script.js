@@ -61,6 +61,10 @@ const gageResultBox = document.getElementById('gageResultBox');
 const gageResultText = document.getElementById('gageResultText');
 const gageResultInfo = document.getElementById('gageResultInfo');
 
+const gageProposeArea = document.getElementById('gageProposeArea');
+const gageWaitArea = document.getElementById('gageWaitArea');
+const gageSentArea = document.getElementById('gageSentArea');
+
 // Toggle power details on emoji click
 powerToggleBtn.addEventListener('click', () => {
     powerDetails.classList.toggle('hidden');
@@ -391,11 +395,10 @@ function handleGameState(state) {
                     notifs.push(`
                         <div class="drinking-box" style="display:flex; flex-direction:column; gap:15px; background: rgba(225, 29, 72, 0.1); padding: 20px; border-radius: 15px; border: 1px solid var(--primary);">
                             <span style="font-size: 1.2rem;">🍷 Vous devez boire <strong>${loser.sipsToDrink}</strong> gorgée(s) !</span>
-                            <div style="display:flex; gap:12px; justify-content:center; flex-wrap: wrap;">
-                                <button class="btn success" onclick="socket.emit('validateDrink', socket.id)" style="min-width: 140px;">C'est fait ✅</button>
-                                <button class="btn warning" onclick="socket.emit('chooseGage')" style="min-width: 140px;">🎰 ROULETTE GAGE</button>
+                            <div style="display:flex; gap:12px; justify-content:center;">
+                                <button class="btn warning" onclick="socket.emit('chooseGage')" style="min-width: 140px; width: 100%;">🎰 ROULETTE GAGE</button>
                             </div>
-                            <small style="color: var(--text-dim)">Besoin de ${state.requiredValidations} validations de vos amis.</small>
+                            <small style="color: var(--text-dim)">Ou buvez vos gorgées et attendez la validation.</small>
                         </div>
                     `);
                 } else {
@@ -489,49 +492,46 @@ function renderGageSystem(state) {
         rouletteDisplay.classList.add('hidden');
         
         if (isTarget) {
-            proposeGageBox.classList.remove('hidden');
-            proposeGageBox.innerHTML = `<h3>⌛ On vous prépare un gage...</h3><p>Les autres joueurs sont en train de voter pour votre destin.</p>`;
+            gageProposeArea.classList.add('hidden');
+            gageSentArea.classList.add('hidden');
+            gageWaitArea.classList.remove('hidden');
         } else {
-            proposeGageBox.classList.remove('hidden');
-            // Check if already proposed
+            gageWaitArea.classList.add('hidden');
             const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
+            
             if (hasProposed) {
-                proposeGageBox.innerHTML = `<h3>✅ Proposition envoyée</h3><p>Attendez que la roulette soit lancée.</p>`;
+                gageProposeArea.classList.add('hidden');
+                gageSentArea.classList.remove('hidden');
             } else {
-                // Restore original HTML if needed (first time)
-                if (!proposeGageBox.querySelector('#btnSendGage')) {
-                    proposeGageBox.innerHTML = `
-                        <h3>💡 Proposez un gage !</h3>
-                        <p>Le perdant a choisi un gage... Soyez créatifs.</p>
-                        <input type="text" id="gageInput" placeholder="Ex: Faire 10 pompes" />
-                        <button id="btnSendGage" class="btn primary">Envoyer 📤</button>
-                        <p id="proposalsCount" style="margin-top:10px; font-size:0.9rem; color:var(--text-dim);"></p>
-                        <button id="btnSpinRoulette" class="btn action hidden" style="background:#eab308; color:black; margin-top:10px;">Lancer la Roulette 🎰</button>
-                    `;
-                    // Re-attach listeners because we innerHTMLed
-                    document.getElementById('btnSendGage').onclick = () => {
-                        const val = document.getElementById('gageInput').value.trim();
-                        if (val) socket.emit('proposeGage', { gage: val });
-                    };
-                    document.getElementById('btnSpinRoulette').onclick = () => {
-                        socket.emit('spinGageRoulette');
-                    };
-                }
+                gageProposeArea.classList.remove('hidden');
+                gageSentArea.classList.add('hidden');
             }
             
-            const countEl = document.getElementById('proposalsCount');
-            if (countEl) countEl.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
+            proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
             
-            const spinBtn = document.getElementById('btnSpinRoulette');
-            if (spinBtn) {
-                if (isCreator && state.proposedGages.length > 0) spinBtn.classList.remove('hidden');
-                else spinBtn.classList.add('hidden');
+            if (isCreator && state.proposedGages.length > 0) {
+                btnSpinRoulette.classList.remove('hidden');
+            } else {
+                btnSpinRoulette.classList.add('hidden');
             }
         }
     } else if (state.gameState !== 'gage_roulette') {
         gageOverlay.classList.add('hidden');
     }
 }
+
+// Fixed listeners
+btnSendGage.addEventListener('click', () => {
+    const val = gageInput.value.trim();
+    if (val) {
+        socket.emit('proposeGage', { gage: val });
+        gageInput.value = '';
+    }
+});
+
+btnSpinRoulette.addEventListener('click', () => {
+    socket.emit('spinGageRoulette');
+});
 
 socket.on('gageResult', (data) => {
     // Show only for target room
