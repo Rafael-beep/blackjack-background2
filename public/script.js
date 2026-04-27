@@ -513,77 +513,60 @@ let currentlyAnimatingGage = null;
 function renderGageSystem(state) {
     if (!state) return;
 
-    // Reset total si on n'est pas dans une phase de gage
+    // Diagnostic console (visible en faisant F12)
+    if (state.activeGageData) {
+        console.log("DIAGNOSTIC GAGE:", state.gameState, state.activeGageData.text);
+    }
+
     const gageStates = ['proposing_gages', 'gage_roulette', 'gage_result'];
     if (!gageStates.includes(state.gameState)) {
-        gageOverlay.classList.add('hidden');
+        document.getElementById('gageOverlay').classList.add('hidden');
         currentlyAnimatingGage = null;
         return;
     }
 
-    gageOverlay.classList.remove('hidden');
+    document.getElementById('gageOverlay').classList.remove('hidden');
 
-    // 1. Phase de PROPOSITION
     if (state.gameState === 'proposing_gages') {
-        gageBox.classList.remove('hidden');
-        rouletteDisplay.classList.add('hidden');
-        gageResultBox.classList.add('hidden');
-
-        const isTarget = state.gageTargetPlayerId === socket.id;
-        if (isTarget) {
-            gageProposeArea.classList.add('hidden');
-            gageSentArea.classList.add('hidden');
-            gageWaitArea.classList.remove('hidden');
-        } else {
-            gageWaitArea.classList.add('hidden');
-            const hasProposed = state.proposedGages.some(g => g.playerId === socket.id);
-            if (hasProposed) {
-                gageProposeArea.classList.add('hidden');
-                gageSentArea.classList.remove('hidden');
-            } else {
-                gageProposeArea.classList.remove('hidden');
-                gageSentArea.classList.add('hidden');
-            }
-            proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
-        }
+        document.getElementById('gageBox').classList.remove('hidden');
+        document.getElementById('rouletteDisplay').classList.add('hidden');
+        document.getElementById('gageResultBox').classList.add('hidden');
+        // ... count update ...
+        document.getElementById('proposalsCount').textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
     } 
-    // 2. Phase de ROULETTE
     else if (state.gameState === 'gage_roulette') {
-        gageBox.classList.add('hidden');
-        rouletteDisplay.classList.remove('hidden');
-        gageResultBox.classList.add('hidden');
+        document.getElementById('gageBox').classList.add('hidden');
+        document.getElementById('rouletteDisplay').classList.remove('hidden');
+        document.getElementById('gageResultBox').classList.add('hidden');
 
-        const winGage = state.lastGageResult ? state.lastGageResult.gage : null;
+        const winGage = state.activeGageData ? state.activeGageData.text : null;
         
         if (winGage && currentlyAnimatingGage !== winGage) {
             currentlyAnimatingGage = winGage;
-            console.log("Lancement Roulette pour:", winGage);
             
-            // Animation simplifiée
-            const items = ["?", "🍷", "!!!", winGage, "OUCH", "ZUT", winGage, "VITE", winGage];
-            rouletteAnimation.innerHTML = items.map(it => `<div class="roulette-item">${it}</div>`).join('');
+            const animDiv = document.getElementById('rouletteAnimation');
+            const items = ["?", "🍷", "GAGE", winGage, "OUCH", "ZUT", winGage, "VITE", winGage];
+            animDiv.innerHTML = items.map(it => `<div class="roulette-item" style="color:white !important;">${it}</div>`).join('');
             
-            rouletteAnimation.style.transition = 'none';
-            rouletteAnimation.style.transform = 'translateX(0)';
+            animDiv.style.transition = 'none';
+            animDiv.style.transform = 'translateX(0)';
             
             setTimeout(() => {
-                rouletteAnimation.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
-                // Valeur fixe de secours pour le décalage
-                rouletteAnimation.style.transform = `translateX(-1200px)`;
+                animDiv.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                animDiv.style.transform = `translateX(-1400px)`;
             }, 100);
         }
     } 
-    // 3. Phase de RESULTAT
     else if (state.gameState === 'gage_result') {
-        gageBox.classList.add('hidden');
-        rouletteDisplay.classList.add('hidden');
-        gageResultBox.classList.remove('hidden');
+        document.getElementById('gageBox').classList.add('hidden');
+        document.getElementById('rouletteDisplay').classList.add('hidden');
+        document.getElementById('gageResultBox').classList.remove('hidden');
 
-        if (state.lastGageResult && state.lastGageResult.gage) {
-            gageResultText.innerHTML = `<span style="color:#facc15">${state.lastGageResult.gage}</span>`;
-            gageResultInfo.textContent = `Pour ${state.lastGageResult.targetName} — Proposé par ${state.lastGageResult.proposer}`;
+        if (state.activeGageData && state.activeGageData.text) {
+            document.getElementById('gageResultText').innerHTML = `<span style="color:#facc15 !important; font-weight:bold;">${state.activeGageData.text}</span>`;
+            document.getElementById('gageResultInfo').textContent = `Pour ${state.activeGageData.targetName} — Proposé par ${state.activeGageData.proposer}`;
         } else {
-            gageResultText.textContent = "Gage : " + (currentlyAnimatingGage || "En attente...");
+            document.getElementById('gageResultText').textContent = "Gage : " + (currentlyAnimatingGage || "Erreur de donnée");
         }
     }
 }

@@ -237,7 +237,7 @@ io.on('connection', (socket) => {
             powersEnabled: true,
             proposedGages: [],
             gageTargetPlayerId: null,
-            lastGageResult: null // Store result here
+            activeGageData: null 
         };
 
         joinRoom(socket, roomId, playerName);
@@ -583,8 +583,8 @@ io.on('connection', (socket) => {
             console.log(`[ROULETTE] Room ${roomId}: Winner chosen -> "${winnerGage.text}" by ${winnerGage.playerName}`);
 
             room.gameState = 'gage_roulette';
-            room.lastGageResult = {
-                gage: winnerGage.text,
+            room.activeGageData = {
+                text: winnerGage.text,
                 proposer: winnerGage.playerName,
                 targetName: room.players.find(p => p.id === room.gageTargetPlayerId)?.name
             };
@@ -614,7 +614,7 @@ io.on('connection', (socket) => {
                     
                     room.proposedGages = [];
                     room.gageTargetPlayerId = null;
-                    room.lastGageResult = null;
+                    room.activeGageData = null;
                     broadcastUpdate(roomId);
                 }, 5000);
             }, 6000); 
