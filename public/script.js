@@ -149,6 +149,7 @@ socket.on('updateState', (state) => {
     renderOtherPlayers(state);
     renderCheatMenu(state);
     handleGameState(state);
+    renderGageSystem(state); // <--- L'OUBLI ÉTAIT ICI
 });
 
 function getSuitSymbol(suit) {
