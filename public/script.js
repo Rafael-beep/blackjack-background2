@@ -50,6 +50,7 @@ const lacheTargetSelect = document.getElementById('lacheTargetSelect');
 const btnUseLache = document.getElementById('btnUseLache');
 
 const gageOverlay = document.getElementById('gageOverlay');
+const gageBox = document.getElementById('gageBox');
 const gageProposeArea = document.getElementById('gageProposeArea');
 const gageWaitArea = document.getElementById('gageWaitArea');
 const gageSentArea = document.getElementById('gageSentArea');
