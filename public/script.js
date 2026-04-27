@@ -126,7 +126,7 @@ socket.on('updateState', (state) => {
     roomNameDisplay.textContent = state.id;
     sipsBetDisplay.textContent = state.sipsBet;
 
-    renderGageSystem(state);
+    // renderGageSystem moved to the end for better consistency
 
     // Powers toggle visibility/availability
     const isCreator = state.players.length > 0 && state.players[0].id === socket.id;
@@ -507,12 +507,13 @@ window.sendGageProposal = function() {
 };
 
 function renderGageSystem(state) {
-    const isTarget = state.gageTargetPlayerId === socket.id;
-    const isCreator = state.players.length > 0 && state.players[0].id === socket.id;
-    
     if (state.gameState === 'proposing_gages') {
+        const isTarget = state.gageTargetPlayerId === socket.id;
+        
         gageOverlay.classList.remove('hidden');
-        gageBox.classList.remove('hidden'); // CRITICAL: Reset visibility for 2nd game
+        gageBox.style.display = 'block'; // Force block display
+        gageBox.classList.remove('hidden'); 
+        
         gageResultBox.classList.add('hidden');
         rouletteDisplay.classList.add('hidden');
         
@@ -535,9 +536,8 @@ function renderGageSystem(state) {
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
     } else if (state.gameState === 'gage_roulette') {
-        // While spinning, ensure overlay is visible but don't touch sub-elements
-        // as the gageResult event already handled them.
         gageOverlay.classList.remove('hidden');
+        gageBox.classList.add('hidden');
     } else {
         gageOverlay.classList.add('hidden');
     }

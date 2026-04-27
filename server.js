@@ -581,8 +581,8 @@ io.on('connection', (socket) => {
             
             room.gameState = 'gage_roulette'; // NEW STATE
             
-            // Broadcast the result
-            io.emit('gageResult', {
+            // Broadcast the result ONLY to the room
+            io.to(roomId).emit('gageResult', {
                 roomId: roomId,
                 targetName: room.players.find(p => p.id === room.gageTargetPlayerId)?.name,
                 gage: winnerGage.text,
