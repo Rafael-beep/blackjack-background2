@@ -75,9 +75,6 @@
             <!-- Gage System Overlay -->
             <div id="gageOverlay" class="gage-overlay hidden">
                 <div id="gageBox" class="gage-box">
-                    <!-- Button visible by default now, managed by JS style.display -->
-                    <button id="btnSpinRoulette" class="btn warning" style="display:none; margin-bottom:20px; width: 100%; border: 3px solid #ff0000; background: #ffff00; color: black; font-weight: 900; font-size: 1.2rem;">🎰 LANCER LA ROULETTE 🎰</button>
-                    
                     <div id="gageProposeArea">
                         <h3>💡 Proposez un gage !</h3>
                         <p>Le perdant a choisi un gage... Soyez créatifs.</p>
@@ -85,13 +82,19 @@
                         <button id="btnSendGage" class="btn primary" onclick="sendGageProposal()">Envoyer 📤</button>
                         <p id="proposalsCount" style="margin-top:10px; font-size:0.9rem; color:var(--text-dim);"></p>
                     </div>
+
                     <div id="gageWaitArea" class="hidden">
                         <h3>⌛ On vous prépare un gage...</h3>
                         <p>Les autres joueurs sont en train de voter pour votre destin.</p>
+                        <!-- Button here too -->
+                        <button class="btn warning" onclick="socket.emit('spinGageRoulette')" style="margin-top:20px; width: 100%; border: 3px solid white; font-weight: bold;">🎰 LANCER LA ROULETTE 🎰</button>
                     </div>
+
                     <div id="gageSentArea" class="hidden">
-                        <h3>✅ Proposition envoyée</h3>
+                        <h3>✅ PROPOSITION ENVOYÉE</h3>
                         <p>Attendez que la roulette soit lancée.</p>
+                        <!-- Button here too -->
+                        <button class="btn warning" onclick="socket.emit('spinGageRoulette')" style="margin-top:20px; width: 100%; border: 3px solid white; font-weight: bold;">🎰 LANCER LA ROULETTE 🎰</button>
                     </div>
                 </div>
 

@@ -50,13 +50,10 @@ const lacheTargetSelect = document.getElementById('lacheTargetSelect');
 const btnUseLache = document.getElementById('btnUseLache');
 
 const gageOverlay = document.getElementById('gageOverlay');
-const gageBox = document.getElementById('gageBox');
 const gageProposeArea = document.getElementById('gageProposeArea');
 const gageWaitArea = document.getElementById('gageWaitArea');
 const gageSentArea = document.getElementById('gageSentArea');
 const gageInput = document.getElementById('gageInput');
-const btnSendGage = document.getElementById('btnSendGage');
-const btnSpinRoulette = document.getElementById('btnSpinRoulette');
 const proposalsCount = document.getElementById('proposalsCount');
 const rouletteDisplay = document.getElementById('rouletteDisplay');
 const rouletteAnimation = document.getElementById('rouletteAnimation');
@@ -534,24 +531,12 @@ function renderGageSystem(state) {
             
             proposalsCount.textContent = `${state.proposedGages.length} gage(s) proposé(s)`;
         }
-
-        // FORCE VISIBILITY IF GAGES EXIST
-        if (state.proposedGages && state.proposedGages.length > 0) {
-            console.log("!!! ROULETTE READY !!! Count:", state.proposedGages.length);
-            btnSpinRoulette.style.setProperty('display', 'block', 'important');
-            btnSpinRoulette.classList.remove('hidden');
-        } else {
-            btnSpinRoulette.style.display = 'none';
-        }
     } else if (state.gameState !== 'gage_roulette') {
         gageOverlay.classList.add('hidden');
     }
 }
 
 // Fixed listeners
-btnSpinRoulette.addEventListener('click', () => {
-    socket.emit('spinGageRoulette');
-});
 
 socket.on('gageResult', (data) => {
     // Show only for target room
